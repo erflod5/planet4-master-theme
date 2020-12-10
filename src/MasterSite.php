@@ -220,6 +220,8 @@ class MasterSite extends TimberSite {
 				return $post_author;
 			}
 		);
+
+		$this->register_meta_fields();
 	}
 
 	/**
@@ -881,6 +883,22 @@ class MasterSite extends TimberSite {
 	}
 
 	/**
+	 * Declare meta fields
+	 */
+	private function register_meta_fields(): void {
+		// Credit for images, used in image caption.
+		\register_meta(
+			'post',
+			'_credit_text',
+			[
+				'show_in_rest' => true,
+				'type'         => 'string',
+				'single'       => true,
+			]
+		);
+	}
+
+	/**
 	 * Registers oembed provider for Carto map.
 	 */
 	public function register_oembed_provider() {
@@ -1131,6 +1149,10 @@ class MasterSite extends TimberSite {
 			$image_credit = ' ' . $meta['_credit_text'][0];
 			if ( false === strpos( $meta['_credit_text'][0], '©' ) ) {
 				$image_credit = ' ©' . $image_credit;
+			}
+
+			if ( strpos( $content, $image_credit ) !== false ) {
+				return $content;
 			}
 
 			if ( strpos( $content, '<figcaption>' ) !== false ) {
