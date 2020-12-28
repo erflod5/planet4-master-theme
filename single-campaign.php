@@ -117,6 +117,33 @@ foreach ( range( 1, 5 ) as $i ) {
 
 if ( post_password_required( $post->ID ) ) {
 
+	// Check if page url has a unique id(custom hash), appended with it, if not add one.
+	$custom_hash = filter_input( INPUT_GET, 'ch', FILTER_SANITIZE_STRING );
+	if ( ! $custom_hash ) {
+		wp_safe_redirect( add_query_arg( 'ch', md5( uniqid( '', true ) ), get_permalink() ) );
+		exit();
+	}
+
+	/**
+	 * Password protected form validation:
+	 * The latest entered password is stored as a secure hash in a cookie named 'wp-postpass_' . COOKIEHASH.
+	 * When the password form is called, that cookie has been validated already by WordPress.
+	 */
+	if ( isset( $_COOKIE[ 'wp-postpass_' . COOKIEHASH ] ) ) {
+		$old_cookie = get_transient( 'p4-postpass_' . $custom_hash );
+		if ( false === $old_cookie ) {
+			// This code runs when there is no valid transient set.
+			$current_cookie = wp_unslash( $_COOKIE[ 'wp-postpass_' . COOKIEHASH ] );
+			set_transient( 'p4-postpass_' . $custom_hash, $current_cookie, $expiration = 60 * 5 ); // Transient cache expires in 5 mins.
+		} else {
+			$current_cookie = wp_unslash( $_COOKIE[ 'wp-postpass_' . COOKIEHASH ] );
+			set_transient( 'p4-postpass_' . $custom_hash, $current_cookie, $expiration = 60 * 5 );
+			if ( $current_cookie !== $old_cookie ) {
+				$context['validation_error'] = __( 'Sorry, Invalide password.', 'planet4-master-theme' );
+			}
+		}
+	}
+
 	// Hide the campaign title from links to the extra feeds.
 	remove_action( 'wp_head', 'feed_links_extra', 3 );
 
