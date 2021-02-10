@@ -6,7 +6,7 @@ export const setupPDFIcon = function($) {
     const link = $(this);
 
     if (!(link.parent('h1, h2, h3, h4, h5, h6').length || link.has('img').length)) {
-      link.addClass('icon-link pdf-link');
+      link.addClass('pdf-link');
     }
   });
 };
