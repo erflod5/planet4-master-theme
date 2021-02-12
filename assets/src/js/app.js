@@ -9,6 +9,7 @@ import { setupExternalLinks } from './external_links';
 import { setupEnhancedDonateButton } from './enhancedDonateButton';
 
 import 'bootstrap';
+import { setupCSSVarsPonyfill } from './cssvarsponyfill';
 
 function requireAll(r) {
   r.keys().forEach(r);
@@ -27,5 +28,6 @@ jQuery(function($) {
   setupPDFIcon($);
   setupSearch($);
   setupExternalLinks($);
+  setupCSSVarsPonyfill();
   setupEnhancedDonateButton();
 });
